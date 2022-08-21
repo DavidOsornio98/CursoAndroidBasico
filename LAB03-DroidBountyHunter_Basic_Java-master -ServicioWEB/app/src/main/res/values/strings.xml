@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">DroidBountyHunter</string>
+    <!--<string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>-->
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_capturados">Capturados</string>
+    <string name="title_fugitivos">Fugitivos</string>
+    <string name="title_acercade">Acerca de…</string>
+    <string name="menu_agregar">Agregar</string>
+    <string name="boton_guardar">Guardar</string>
+    <string name="boton_capturar">Capturar</string>
+    <string name="boton_eliminar">Eliminar</string>
+    <string name="campo_nombre">Nombre del Fugitivo</string>
+    <string name="message_detail">Mensaje…</string>
+    <string name="develop_by">Desarrollado por:</string>
+    <string name="developer_name">Giovani González</string>
+    <string name="year_developed">2022</string>
+    <string name="company_name">D.W. Training S.C.</string>
+    <string name="title_activity_agregar">Nuevo Fugitivo</string>
+    <string name="title_activity_detalle">Detalle Fugitivo</string>
+
+</resources>
