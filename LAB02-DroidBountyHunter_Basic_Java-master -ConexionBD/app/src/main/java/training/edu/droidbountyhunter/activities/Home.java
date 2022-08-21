@@ -26,8 +26,10 @@ public class Home extends AppCompatActivity {
             });*/
     public ActivityResultLauncher<Intent> result =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> UpdateLists());
+
    private ViewPager mViewPager;
    private SectionsPagerAdapter mSectionsPagerAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +39,10 @@ public class Home extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
+        //SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
+
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(),this); //Esto me falto
+        //para que se mostrara las ventanas al agregar nuevos fugitivos
 
         mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
