@@ -83,13 +83,14 @@ public class DetalleActivity extends AppCompatActivity {
 
         //Lab02
     //setResult(0);
-        finish();
+        //finish();
 
     }
 
     public void OnDeleteClick(View view) {
         database.DeleteFugitivo(fugitivo.getId());
-        setResult(0);
+        //setResult(0);
+        setResult(RESULT_OK);
         finish();
 
     }
