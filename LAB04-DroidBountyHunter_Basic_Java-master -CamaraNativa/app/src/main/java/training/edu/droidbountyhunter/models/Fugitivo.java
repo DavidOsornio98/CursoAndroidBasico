@@ -7,17 +7,27 @@ public class Fugitivo implements Parcelable {
     private int id;
     private String name;
     private String status;
+    private String photo;
 
     public Fugitivo(int id, String name, String status) {
         this.id = id;
         this.name = name;
         this.status = status;
+        this.photo = "";
+    }
+
+    public Fugitivo(int id, String name, String status, String photo) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+        this.photo = photo;
     }
 
     protected Fugitivo(Parcel in) {
         id = in.readInt();
         name = in.readString();
         status = in.readString();
+        photo = in.readString();
     }
 
     public static final Creator<Fugitivo> CREATOR = new Creator<Fugitivo>() {
@@ -48,7 +58,6 @@ public class Fugitivo implements Parcelable {
         this.name = name;
     }
 
-
     public String getStatus() {
         return status;
     }
@@ -57,14 +66,24 @@ public class Fugitivo implements Parcelable {
         this.status = status;
     }
 
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
     @Override
-    public int describeContents() { return 0; }
+    public int describeContents() {
+        return 0;
+    }
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(id);
         parcel.writeString(name);
         parcel.writeString(status);
+        parcel.writeString(photo);
     }
-
 }

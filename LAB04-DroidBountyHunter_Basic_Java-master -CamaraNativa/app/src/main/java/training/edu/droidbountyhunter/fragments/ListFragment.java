@@ -71,18 +71,17 @@ public class ListFragment extends Fragment {
         UpdateList(lista, status);
 
         // Se genera el Listener para el detalle de cada elemento...
-        lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+        //lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            //public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                lista.setOnItemClickListener((adapterView, view1, position, id) -> {
                 ArrayList<Fugitivo> fugitivos = (ArrayList<Fugitivo>) lista.getTag();
                 Fugitivo fugitivo = fugitivos.get(position);
                 Intent intent = new Intent(getActivity(), DetalleActivity.class);
                 intent.putExtra("fugitivo", fugitivo);
                 ((Home) requireActivity()).result.launch(intent);
-            }
+            //}
         });
-
-
         return view;
     }
     private void UpdateList(ListView list, int status) {

@@ -1,11 +1,20 @@
 package training.edu.droidbountyhunter.activities;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +27,7 @@ import training.edu.droidbountyhunter.data.DatabaseBountyHunter;
 import training.edu.droidbountyhunter.interfaces.OnTaskListener;
 import training.edu.droidbountyhunter.models.Fugitivo;
 import training.edu.droidbountyhunter.network.NetServices;
+import training.edu.droidbountyhunter.utils.PictureTools;
 
 public class DetalleActivity extends AppCompatActivity {
     private Fugitivo fugitivo;
@@ -40,6 +50,7 @@ public class DetalleActivity extends AppCompatActivity {
         TextView label = findViewById(R.id.labelMessage);
         capturarButton = findViewById(R.id.buttonCapturar);
         deleteButton = findViewById(R.id.buttonEliminar);
+        Button takePhotoButton = findViewById(R.id.buttonPhoto);
 
 
         // Se identifica si es Fugitivo o Capturado para el mensaje...
@@ -47,12 +58,27 @@ public class DetalleActivity extends AppCompatActivity {
             label.setText("El fugitivo sigue suelto...");
         }else {
             capturarButton.setVisibility(View.GONE);
+            takePhotoButton.setVisibility(View.GONE);
             label.setText("Atrapado!!!");
+            ImageView photoImageView = findViewById(R.id.pictureFugitive);
+            String pathPhoto = fugitivo.getPhoto();
+            if (pathPhoto != null && pathPhoto.length() > 0) {
+                Bitmap bitmap = PictureTools.decodeSampledBitmapFromUri(pathPhoto, 200, 200);
+                photoImageView.setImageBitmap(bitmap);
+            }
+
         }
     }
 
     public void OnCaptureClick(View view) {
         fugitivo.setStatus("1");
+        String pathPhoto = fugitivo.getPhoto();
+        if (pathPhoto == null || pathPhoto.length() == 0) {
+            Toast.makeText(this, "Es necesario tomar la foto antes de capturar al fugitivo",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
         database.UpdateFugitivo(fugitivo);
         //Lab03
         NetServices netServices = new NetServices(new OnTaskListener() {
@@ -105,5 +131,43 @@ public class DetalleActivity extends AppCompatActivity {
                     finish();
                 }).show();
     }
+
+    public ActivityResultLauncher<Intent> resultPicture = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode()==RESULT_OK){
+                    fugitivo.setPhoto(PictureTools.currentPhotoPath);
+                    ImageView imageFugitive = findViewById(R.id.pictureFugitive);
+                    Bitmap bitmap = PictureTools.decodeSampledBitmapFromUri(PictureTools.currentPhotoPath, 200, 200);
+                    imageFugitive.setImageBitmap(bitmap);
+
+                }
+            });
+
+    public void OnFotoClick(View view) {
+        if (PictureTools.permissionReadMemmory(this)) {
+            dispatchPicture();
+        }
+    }
+
+    private void dispatchPicture() {
+        Uri pathImage = PictureTools.with(this).getOutputMediaFileUri();
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, pathImage);
+        resultPicture.launch(intent);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        boolean isGrantedAllPermissions = true;
+        for (int grantResult : grantResults) {
+            isGrantedAllPermissions = isGrantedAllPermissions && (grantResult == PackageManager.PERMISSION_GRANTED);
+        }
+        if (isGrantedAllPermissions && requestCode == PictureTools.REQUEST_CODE) {
+            dispatchPicture();
+        }
+    }
+
+
 
 }
