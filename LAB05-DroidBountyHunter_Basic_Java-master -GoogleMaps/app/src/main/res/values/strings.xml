@@ -21,5 +21,9 @@
     <string name="title_activity_agregar">Nuevo Fugitivo</string>
     <string name="title_activity_detalle">Detalle Fugitivo</string>
     <string name="boton_foto">Tomar Foto</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyCbe6kss-bxC8xdIaanKYXCqrdy8inkwMM</string>
+    <string name="boton_mapa"> Ver Mapa</string>
+    <string name="title_activity_maps">Map</string>
+
 
 </resources>

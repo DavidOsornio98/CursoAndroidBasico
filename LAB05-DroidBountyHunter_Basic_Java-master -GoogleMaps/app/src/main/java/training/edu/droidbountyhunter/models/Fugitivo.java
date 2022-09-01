@@ -8,12 +8,17 @@ public class Fugitivo implements Parcelable {
     private String name;
     private String status;
     private String photo;
+    private double latitude;
+    private double longitude;
+
 
     public Fugitivo(int id, String name, String status) {
         this.id = id;
         this.name = name;
         this.status = status;
         this.photo = "";
+        this.latitude = 0d;
+        this.longitude = 0d;
     }
 
     public Fugitivo(int id, String name, String status, String photo) {
@@ -21,14 +26,30 @@ public class Fugitivo implements Parcelable {
         this.name = name;
         this.status = status;
         this.photo = photo;
+        this.latitude = 0d;
+        this.longitude = 0d;
     }
+
+    public Fugitivo(int id, String name, String status, String photo, double latitude, double longitude) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+        this.photo = photo;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
 
     protected Fugitivo(Parcel in) {
         id = in.readInt();
         name = in.readString();
         status = in.readString();
         photo = in.readString();
+        latitude = in.readDouble();
+        longitude = in.readDouble();
     }
+
+
 
     public static final Creator<Fugitivo> CREATOR = new Creator<Fugitivo>() {
         @Override
@@ -74,6 +95,23 @@ public class Fugitivo implements Parcelable {
         this.photo = photo;
     }
 
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+
     @Override
     public int describeContents() {
         return 0;
@@ -85,5 +123,7 @@ public class Fugitivo implements Parcelable {
         parcel.writeString(name);
         parcel.writeString(status);
         parcel.writeString(photo);
+        parcel.writeDouble(latitude);
+        parcel.writeDouble(longitude);
     }
 }

@@ -1,9 +1,16 @@
 package training.edu.droidbountyhunter.activities;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
@@ -18,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,11 +37,14 @@ import training.edu.droidbountyhunter.models.Fugitivo;
 import training.edu.droidbountyhunter.network.NetServices;
 import training.edu.droidbountyhunter.utils.PictureTools;
 
-public class DetalleActivity extends AppCompatActivity {
+public class DetalleActivity extends AppCompatActivity implements LocationListener {
     private Fugitivo fugitivo;
     private DatabaseBountyHunter database;
     private Button capturarButton;
     private Button deleteButton;
+    private static final int REQUEST_CODE_GPS = 1234;
+    private LocationManager locationManager;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,6 +67,7 @@ public class DetalleActivity extends AppCompatActivity {
         // Se identifica si es Fugitivo o Capturado para el mensaje...
         if(fugitivo.getStatus().equalsIgnoreCase("0")) {
             label.setText("El fugitivo sigue suelto...");
+            ActivarGPS();
         }else {
             capturarButton.setVisibility(View.GONE);
             takePhotoButton.setVisibility(View.GONE);
@@ -69,6 +81,75 @@ public class DetalleActivity extends AppCompatActivity {
 
         }
     }
+    @Override
+    protected void onDestroy() {
+        ApagarGPS();
+        ImageView imageFugitive = findViewById(R.id.pictureFugitive);
+        imageFugitive.setImageBitmap(null);
+        System.gc();
+        super.onDestroy();
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        fugitivo.setLatitude(location.getLatitude());
+        fugitivo.setLongitude(location.getLongitude());
+    }
+
+    @SuppressLint("MissingPermission")
+    private void ActivarGPS() {
+        if (isGPSActivated()) {
+            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            Toast.makeText(this, "Activando GPS...", Toast.LENGTH_LONG).show();
+
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+
+            // BestProvider
+            String provider = locationManager.getBestProvider(criteria, true);
+            // Getting last location available
+            Location location = locationManager.getLastKnownLocation(provider);
+            if (location != null) {
+                fugitivo.setLatitude(location.getLatitude());
+                fugitivo.setLongitude(location.getLongitude());
+            }
+        }
+    }
+
+    private void ApagarGPS() {
+        if (locationManager != null) {
+            try {
+                locationManager.removeUpdates(this);
+                Toast.makeText(this, "Desactivando GPS...", Toast.LENGTH_LONG).show();
+            } catch (SecurityException e) {
+                Toast.makeText(this, "Error desactivando GPS " + e.toString(),
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private boolean isGPSActivated() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                // Should we show the request of permissions
+                ActivityCompat.requestPermissions(this, new
+                        String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_GPS);
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+
+
+
+
 
     public void OnCaptureClick(View view) {
         fugitivo.setStatus("1");
@@ -163,11 +244,29 @@ public class DetalleActivity extends AppCompatActivity {
         for (int grantResult : grantResults) {
             isGrantedAllPermissions = isGrantedAllPermissions && (grantResult == PackageManager.PERMISSION_GRANTED);
         }
-        if (isGrantedAllPermissions && requestCode == PictureTools.REQUEST_CODE) {
+        /*if (isGrantedAllPermissions && requestCode == PictureTools.REQUEST_CODE) {
             dispatchPicture();
+        }*/
+        //permisos de ubicacion
+        if (isGrantedAllPermissions) {
+            switch (requestCode) {
+                case REQUEST_CODE_GPS:
+                    ActivarGPS();
+                    return;
+                case PictureTools.REQUEST_CODE:
+                    dispatchPicture();
+                    return;
+                default:
+            }
         }
+
     }
 
 
+    public void OnMapClick(View view) {
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("fugitivo", fugitivo);
+        startActivity(intent);
 
+    }
 }
